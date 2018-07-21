@@ -84,12 +84,13 @@ def pretty_timedelta(fmt="%d:%02d:%02d", since=None, until=None):
 def add_missing_sentence_terminator(sentence):
     if sentence[-1] in constants.SENTENCE_END_TOKENS: return sentence
 
-    return sentence.strip() + " ."
+    return sentence + " ."
 
 def pad_sentence(sentence):
     return "{} {} {}".format(constants.START_TOKEN, sentence, constants.END_TOKEN)
 
 def canonicalize_sentence(sentence):
+    sentence = sentence.strip()
     sentence = pad_sentence(add_missing_sentence_terminator(sentence))
     return " ".join(canonicalize_words(sentence.split(" ")))
 

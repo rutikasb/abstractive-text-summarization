@@ -119,3 +119,59 @@ class Vocabulary(object):
         print("Projector config written to {:s}".format(projector_config_file))
 
 
+class Vocabulary2(object):
+
+    START_TOKEN = constants.START_TOKEN
+    END_TOKEN   = constants.END_TOKEN
+    UNK_TOKEN   = constants.UNK_TOKEN
+
+    def __init__(self, vocab_filename, size=None):
+        self.unigram_counts = Counter()
+
+        if size is None:
+             with open(vocab_filename, "r") as f:
+                for line in f:
+                    word, word_size = line.split()
+                    self.unigram_counts[word] += int(word_size)
+        else:
+            f = open(vocab_filename, "r")
+            for i in range(size):
+                word, word_size = next(f).split()
+                self.unigram_counts[word] += int(word_size)
+            f.close()
+
+        # Leave space for "<s>", "</s>", and "<unk>"
+        top_counts = self.unigram_counts.most_common(None if size is None else (size - 3))
+        vocab = ([self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN] +
+                 [w for w,c in top_counts])
+
+        # Assign an id to each word, by frequency
+        self.id_to_word = dict(enumerate(vocab))
+        self.word_to_id = {v:k for k,v in self.id_to_word.items()}
+        self.size = len(self.id_to_word)
+        if size is not None:
+            assert(self.size <= size)
+
+        # For convenience
+        self.wordset = set(self.word_to_id.keys())
+
+        # Store special IDs
+        self.START_ID = self.word_to_id[self.START_TOKEN]
+        self.END_ID = self.word_to_id[self.END_TOKEN]
+        self.UNK_ID = self.word_to_id[self.UNK_TOKEN]
+
+    @property
+    def num_unigrams(self):
+        return len(self.unigram_counts)
+
+    def words_to_ids(self, words):
+        return [self.word_to_id.get(w, self.UNK_ID) for w in words]
+
+    def ids_to_words(self, ids):
+        return [self.id_to_word[i] for i in ids]
+
+    def get_word_to_id(self, word):
+        return self.word_to_id.get(word, self.UNK_ID)
+
+    def get_id_to_word(self, i):
+        return self.id_to_word[i]

@@ -9,3 +9,7 @@ UNICODE_DOUBLE_CLOSE_QUOTE = u'\u201d'
 
 # Sentence terminators
 SENTENCE_END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', UNICODE_SINGLE_CLOSE_QUOTE, UNICODE_DOUBLE_CLOSE_QUOTE, ")"]
+
+START_DECODING = "[START]"
+STOP_DECODING = "[STOP]"
+PAD_TOKEN = "[PAD]"

@@ -140,9 +140,11 @@ class Vocabulary2(object):
                 self.unigram_counts[word] += int(word_size)
             f.close()
 
-        # Leave space for "<s>", "</s>", and "<unk>"
-        top_counts = self.unigram_counts.most_common(None if size is None else (size - 3))
-        vocab = ([self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN] +
+        # Leave space for "<s>", "</s>", "<unk>", "[START]", "[STOP]", and "[PAD]"
+        top_counts = self.unigram_counts.most_common(None if size is None else (size - 6))
+        vocab = ([self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
+            constants.START_DECODING, constants.STOP_DECODING,
+            constants.PAD_TOKEN] +
                  [w for w,c in top_counts])
 
         # Assign an id to each word, by frequency

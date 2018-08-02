@@ -4,3 +4,5 @@
 **/tf_summaries/
 data
 logs
+.DS_STORE
+*.swp

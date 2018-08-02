@@ -162,7 +162,7 @@ class Vocabulary2(object):
         self.END_ID = self.word_to_id[self.END_TOKEN]
         self.UNK_ID = self.word_to_id[self.UNK_TOKEN]
 
-    @property
+    # @property
     def num_unigrams(self):
         return len(self.unigram_counts)
 
@@ -177,3 +177,45 @@ class Vocabulary2(object):
 
     def get_id_to_word(self, i):
         return self.id_to_word[i]
+
+    def article_to_ids(self, article_words):
+        ids = []
+        oov_words = []
+        for word in article_words:
+            i = self.word_to_id.get(word, self.UNK_ID)
+            if i == self.UNK_ID:
+                oov_words.append(word) if word
+                oov_id = oov_words.index(word)
+                ids.append(self.size + oov_id)
+            else:
+                ids.append(i)
+        return ids, oov_words
+
+    def abstract_to_ids(self, abstract_words, article_oov_words):
+        ids = []
+        for word in abstract_words:
+            i = self.word_to_id.get(word, self.UNK_ID)
+            if i == self.UNK_ID:
+                if word in article_oov_words:
+                    vocab_index = self.size + article_oov_words.index(word)
+                    ids.append(vocab_index)
+                else:
+                    ids.append(i)
+            else:
+                ids.append(i)
+        return ids
+
+    def output_ids_to_words(ids, article_oov_words):
+        words = []
+        for i in ids:
+            try:
+                word = self.id_to_word[i]
+            except KeyError as e:
+                assert article_oov_words is not None, "Error: model produced a word ID that isn't in the vocabulary. This should not happen in baseline (no pointer-generator) mode"
+                article_oov_index = i - self.size
+                try:
+                    word = article_oov_words[article_oov_index]
+                except KeyError as e:
+                    raise ValueError('Error: model produced word ID %i which corresponds to article OOV %i but this example only has %i article OOVs' % (i, article_oov_index, len(article_oov_words)))
+            words.append(word)
+        return words

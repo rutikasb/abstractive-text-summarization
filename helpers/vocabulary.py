@@ -184,7 +184,7 @@ class Vocabulary2(object):
         for word in article_words:
             i = self.word_to_id.get(word, self.UNK_ID)
             if i == self.UNK_ID:
-                oov_words.append(word) if word
+                if word: oov_words.append(word)
                 oov_id = oov_words.index(word)
                 ids.append(self.size + oov_id)
             else:
